@@ -1,0 +1,65 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(uuid())
+  name      String
+  email     String   @unique
+  password  String
+  role      String   @default("USER") // ADMIN or USER
+  createdAt DateTime @default(now())
+}
+
+model SensorReading {
+  id          String   @id @default(uuid())
+  sensor_id   String
+  sensor_type String
+  value       Float
+  unit        String
+  location    String
+  status      String   @default("NORMAL")
+  timestamp   DateTime @default(now())
+
+  @@index([sensor_id, timestamp(sort: Desc)])
+  @@index([timestamp(sort: Desc)])
+}
+
+model Alert {
+  id        String   @id @default(uuid())
+  sensor_id String
+  severity  String
+  message   String
+  createdAt DateTime @default(now())
+  resolved  Boolean  @default(false)
+
+  @@index([createdAt(sort: Desc)])
+}
+
+model AutomationRule {
+  id        String   @id @default(uuid())
+  condition String   // e.g., "gas > 800"
+  action    String   // e.g., "TURN_ON_FAN"
+  enabled   Boolean  @default(true)
+}
+
+model ActuatorLog {
+  id        String   @id @default(uuid())
+  actuator  String
+  command   String
+  status    String
+  timestamp DateTime @default(now())
+
+  @@index([timestamp(sort: Desc)])
+}
+model Subscriber {
+  id        String   @id @default(uuid())
+  chatId    String   @unique
+  name      String?
+  createdAt DateTime @default(now())
+}

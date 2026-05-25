@@ -1,0 +1,19 @@
+{
+  "name": "iot-monitoring-system",
+  "version": "1.0.0",
+  "description": "IoT Monitoring System with Backend & Frontend",
+  "private": true,
+  "scripts": {
+    "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\" && echo. && echo =========================================== && echo Frontend: http://localhost:3000 && echo Backend:  http://localhost:5000 && echo ===========================================",
+    "dev:frontend": "cd frontend && npm run dev",
+    "dev:backend": "cd backend && npm run dev",
+    "build": "npm --prefix backend run build && npm --prefix frontend run build",
+    "start:backend": "cd backend && npm start",
+    "start:frontend": "cd frontend && npm start",
+    "install:all": "npm install && cd backend && npm install && cd ../frontend && npm install && cd .."
+  },
+  "devDependencies": {
+    "concurrently": "^9.0.1",
+    "typescript": "^6.0.3"
+  }
+}
