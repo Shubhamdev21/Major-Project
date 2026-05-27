@@ -8,7 +8,7 @@ const generateFluctuation = (base: number, variance: number) => {
 const startSimulators = () => {
   // Temperature Simulator
   setInterval(() => {
-    const value = generateFluctuation(25, 10); // 15 to 35
+    const value = generateFluctuation(25, 10);
     const payload = {
       sensor_id: 'TEMP_001',
       value: parseFloat(value.toFixed(2)),
@@ -22,7 +22,7 @@ const startSimulators = () => {
 
   // Humidity Simulator
   setInterval(() => {
-    const value = generateFluctuation(50, 15); // 35 to 65
+    const value = generateFluctuation(50, 15);
     const payload = {
       sensor_id: 'HUM_001',
       value: parseFloat(value.toFixed(2)),
@@ -36,11 +36,9 @@ const startSimulators = () => {
 
   // Gas Simulator
   setInterval(() => {
-    const value = generateFluctuation(400, 200); // 200 to 600
-    // Occasional spike
+    const value = generateFluctuation(400, 200);
     const isLeak = Math.random() > 0.95;
     const finalValue = isLeak ? generateFluctuation(900, 100) : value;
-    
     const payload = {
       sensor_id: 'GAS_001',
       value: parseFloat(finalValue.toFixed(2)),
@@ -54,7 +52,7 @@ const startSimulators = () => {
 
   // Light Simulator
   setInterval(() => {
-    const value = generateFluctuation(300, 50); // 250 to 350
+    const value = generateFluctuation(300, 50);
     const payload = {
       sensor_id: 'LGT_001',
       value: parseFloat(value.toFixed(2)),
@@ -68,13 +66,8 @@ const startSimulators = () => {
 };
 
 client.on('connect', () => {
-  logger.info('Sensor Simulator initialized using internal bus');
+  logger.info('Sensor Simulator connected to MQTT broker');
   startSimulators();
 });
-
-// Since it's a mock client and might already be "connected"
-if (client) {
-  startSimulators();
-}
 
 export default client;
