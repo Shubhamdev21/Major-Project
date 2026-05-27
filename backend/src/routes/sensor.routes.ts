@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { getCurrentSensors, getSensorHistory, getAllHistory, getAnalytics } from '../controllers/sensor.controller';
-import { authenticate } from '../middleware/auth.middleware';
+import { authenticate } from '../middleware/auth';
 
 const router = Router();
 
