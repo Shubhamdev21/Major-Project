@@ -39,7 +39,7 @@ export default function DashboardLayout({
     fetchInitialData();
 
     // Setup WebSocket
-    const socketUrl = process.env.NEXT_PUBLIC_SOCKET_URL || 'http://localhost:5000';
+    const socketUrl = process.env.NEXT_PUBLIC_WS_URL || 'http://localhost:5000';
     const socket = io(socketUrl);
 
     socket.on('sensor_update', (data) => {
@@ -66,7 +66,7 @@ export default function DashboardLayout({
           {/* Background glow effects */}
           <div className="absolute top-[20%] left-[20%] w-[50%] h-[50%] rounded-full bg-primary/5 blur-[150px] pointer-events-none" />
           <Topbar />
-          <main className="flex-1 overflow-x-hidden overflow-y-auto p-6 z-10 pb-20">
+          <main className="flex-1 overflow-x-hidden overflow-y-auto p-4 sm:p-6 z-10 pb-20 pt-16 md:pt-6">
             {children}
           </main>
           <footer className="absolute bottom-0 left-0 right-0 p-4 border-t border-white/5 bg-background/50 backdrop-blur-md z-20 flex justify-between items-center text-[10px] font-mono text-muted-foreground uppercase tracking-widest px-8">

@@ -1,167 +1,130 @@
 "use client";
-import { useState } from "react";
 import { useStore } from "@/store/useStore";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
-import { Button } from "@/components/ui/button";
-import { toast } from "sonner";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Activity, AlertTriangle, Thermometer, Wind, Droplets, Zap } from "lucide-react";
 
-export default function SettingsPage() {
-  const [chatId, setChatId] = useState("");
-  const [name, setName] = useState("");
-  const [loading, setLoading] = useState(false);
+const sensorIcons: Record<string, React.ElementType> = {
+  temperature: Thermometer,
+  humidity: Droplets,
+  gas: Wind,
+  power: Zap,
+  default: Activity,
+};
 
-  const handleSave = () => {
-    toast.success("Settings saved successfully");
-  };
-
-  const handleSubscribe = async () => {
-    if (!chatId) {
-      toast.error("Please enter your Telegram Chat ID!");
-      return;
-    }
-    setLoading(true);
-    try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/subscribers`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ chatId, name }),
-      });
-      const data = await res.json();
-      if (res.ok) {
-        toast.success("ðŸŽ‰ Subscribed! You'll receive Telegram alerts!");
-        setChatId("");
-        setName("");
-      } else {
-        toast.error(data.error || "Failed to subscribe");
-      }
-    } catch (err) {
-      toast.error("Something went wrong!");
-    } finally {
-      setLoading(false);
-    }
-  };
+export default function OverviewPage() {
+  const { sensors, alerts } = useStore();
+  const sensorList = Object.values(sensors);
+  const activeAlerts = alerts.filter((a) => !a.resolved);
 
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight neon-text mb-2">System Settings</h1>
-        <p className="text-muted-foreground">Configure your industrial monitoring preferences.</p>
+        <h1 className="text-2xl sm:text-3xl font-bold tracking-tight neon-text mb-2">System Overview</h1>
+        <p className="text-muted-foreground text-sm sm:text-base">Real-time industrial monitoring dashboard.</p>
       </div>
-      <div className="grid gap-6 max-w-2xl">
 
-        {/* Telegram Subscription Card */}
-        <Card className="glass border border-primary/30">
-          <CardHeader>
-            <CardTitle>ðŸ“± Subscribe to Telegram Alerts</CardTitle>
-            <CardDescription>
-              Get real-time industrial alerts directly on your Telegram!
-            </CardDescription>
+      {/* Stats row */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+        <Card className="glass border border-primary/20">
+          <CardHeader className="pb-2 p-3 sm:p-6">
+            <CardTitle className="text-xs sm:text-sm font-medium text-muted-foreground">Active Sensors</CardTitle>
           </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="bg-primary/10 rounded-lg p-4 text-sm space-y-2">
-              <p className="font-semibold text-primary">How to get your Chat ID:</p>
-              <ol className="list-decimal list-inside space-y-1 text-muted-foreground">
-                <li>Open Telegram app</li>
-                <li>Search for <span className="text-primary font-mono">@userinfobot</span></li>
-                <li>Send <span className="text-primary font-mono">/start</span></li>
-                <li>Copy the ID number it gives you</li>
-              </ol>
-            </div>
-            <div className="space-y-2">
-              <Label>Your Name (optional)</Label>
-              <input
-                type="text"
-                placeholder="Enter your name"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                className="w-full bg-background/50 border border-white/10 rounded px-3 py-2 text-sm focus:outline-none focus:border-primary"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label>Telegram Chat ID *</Label>
-              <input
-                type="text"
-                placeholder="e.g. 123456789"
-                value={chatId}
-                onChange={(e) => setChatId(e.target.value)}
-                className="w-full bg-background/50 border border-white/10 rounded px-3 py-2 text-sm focus:outline-none focus:border-primary"
-              />
-            </div>
-            <Button
-              onClick={handleSubscribe}
-              disabled={loading}
-              className="w-full neon-border bg-primary/20 hover:bg-primary/40 text-primary-foreground"
-            >
-              {loading ? "Subscribing..." : "ðŸ”” Subscribe to Alerts"}
-            </Button>
+          <CardContent className="p-3 sm:p-6 pt-0">
+            <div className="text-2xl sm:text-3xl font-bold text-primary neon-text">{sensorList.length}</div>
           </CardContent>
         </Card>
-
-        <Card className="glass">
-          <CardHeader>
-            <CardTitle>Notifications</CardTitle>
-            <CardDescription>Manage how you receive alerts.</CardDescription>
+        <Card className="glass border border-destructive/20">
+          <CardHeader className="pb-2 p-3 sm:p-6">
+            <CardTitle className="text-xs sm:text-sm font-medium text-muted-foreground">Active Alerts</CardTitle>
           </CardHeader>
-          <CardContent className="space-y-6">
-            <div className="flex items-center justify-between">
-              <div className="space-y-0.5">
-                <Label>Push Notifications</Label>
-                <p className="text-xs text-muted-foreground">Receive real-time alerts in the browser.</p>
-              </div>
-              <Switch defaultChecked />
-            </div>
-            <div className="flex items-center justify-between">
-              <div className="space-y-0.5">
-                <Label>Telegram Alerts</Label>
-                <p className="text-xs text-muted-foreground">Forward critical alerts to your Telegram bot.</p>
-              </div>
-              <Switch defaultChecked />
-            </div>
-            <div className="flex items-center justify-between">
-              <div className="space-y-0.5">
-                <Label>Email Digest</Label>
-                <p className="text-xs text-muted-foreground">Receive daily summary reports via email.</p>
-              </div>
-              <Switch />
+          <CardContent className="p-3 sm:p-6 pt-0">
+            <div className="text-2xl sm:text-3xl font-bold text-destructive">{activeAlerts.length}</div>
+          </CardContent>
+        </Card>
+        <Card className="glass border border-chart-3/20">
+          <CardHeader className="pb-2 p-3 sm:p-6">
+            <CardTitle className="text-xs sm:text-sm font-medium text-muted-foreground">System Status</CardTitle>
+          </CardHeader>
+          <CardContent className="p-3 sm:p-6 pt-0">
+            <div className="text-lg sm:text-2xl font-bold text-chart-3 neon-text flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-chart-3 animate-pulse" />
+              ONLINE
             </div>
           </CardContent>
         </Card>
-
-        <Card className="glass">
-          <CardHeader>
-            <CardTitle>System Preferences</CardTitle>
-            <CardDescription>General monitoring behavior.</CardDescription>
+        <Card className="glass border border-primary/20">
+          <CardHeader className="pb-2 p-3 sm:p-6">
+            <CardTitle className="text-xs sm:text-sm font-medium text-muted-foreground">Normal Readings</CardTitle>
           </CardHeader>
-          <CardContent className="space-y-6">
-            <div className="flex items-center justify-between">
-              <div className="space-y-0.5">
-                <Label>Auto-Resolve Alerts</Label>
-                <p className="text-xs text-muted-foreground">Mark alerts as resolved when sensors return to normal.</p>
-              </div>
-              <Switch defaultChecked />
-            </div>
-            <div className="flex items-center justify-between">
-              <div className="space-y-0.5">
-                <Label>Refresh Interval</Label>
-                <p className="text-xs text-muted-foreground">Frequency of analytics data polling.</p>
-              </div>
-              <select className="bg-background/50 border border-white/10 rounded px-2 py-1 text-sm focus:outline-none focus:border-primary">
-                <option>5 Seconds</option>
-                <option>10 Seconds</option>
-                <option>30 Seconds</option>
-              </select>
+          <CardContent className="p-3 sm:p-6 pt-0">
+            <div className="text-2xl sm:text-3xl font-bold text-primary neon-text">
+              {sensorList.filter((s) => s.status === "NORMAL").length}
             </div>
           </CardContent>
         </Card>
+      </div>
 
-        <div className="flex justify-end">
-          <Button onClick={handleSave} className="neon-border bg-primary/20 hover:bg-primary/40 text-primary-foreground">
-            SAVE CONFIGURATION
-          </Button>
+      {/* Sensor readings */}
+      <div>
+        <h2 className="text-lg font-semibold mb-3 text-foreground">Live Sensor Readings</h2>
+        {sensorList.length === 0 ? (
+          <Card className="glass">
+            <CardContent className="p-8 text-center text-muted-foreground">
+              <Activity className="mx-auto h-10 w-10 mb-3 opacity-40" />
+              <p>Waiting for sensor data...</p>
+              <p className="text-xs mt-1">Backend simulator will start sending data shortly.</p>
+            </CardContent>
+          </Card>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3 sm:gap-4">
+            {sensorList.map((sensor) => {
+              const Icon = sensorIcons[sensor.sensor_type] ?? sensorIcons.default;
+              const isAlert = sensor.status !== "NORMAL";
+              return (
+                <Card key={sensor.sensor_id} className={`glass transition-all ${isAlert ? "border border-destructive/50" : "border border-white/10"}`}>
+                  <CardContent className="p-4">
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center gap-2">
+                        <Icon className={`h-5 w-5 ${isAlert ? "text-destructive" : "text-primary"}`} />
+                        <span className="text-sm font-medium capitalize">{sensor.sensor_type}</span>
+                      </div>
+                      <span className={`text-xs px-2 py-0.5 rounded-full font-mono ${isAlert ? "bg-destructive/20 text-destructive" : "bg-chart-3/20 text-chart-3"}`}>
+                        {sensor.status}
+                      </span>
+                    </div>
+                    <div className="text-2xl font-bold text-foreground">
+                      {sensor.value.toFixed(1)} <span className="text-sm text-muted-foreground">{sensor.unit}</span>
+                    </div>
+                    <div className="text-xs text-muted-foreground mt-1">{sensor.location} · {sensor.sensor_id}</div>
+                  </CardContent>
+                </Card>
+              );
+            })}
+          </div>
+        )}
+      </div>
+
+      {/* Recent alerts */}
+      {activeAlerts.length > 0 && (
+        <div>
+          <h2 className="text-lg font-semibold mb-3 flex items-center gap-2">
+            <AlertTriangle className="h-5 w-5 text-destructive" /> Recent Alerts
+          </h2>
+          <div className="space-y-2">
+            {activeAlerts.slice(0, 5).map((alert) => (
+              <Card key={alert.id} className="glass border border-destructive/30">
+                <CardContent className="p-3 flex items-center justify-between gap-2">
+                  <div>
+                    <p className="text-sm font-medium text-destructive">{alert.message}</p>
+                    <p className="text-xs text-muted-foreground">{alert.sensor_id} · {new Date(alert.createdAt).toLocaleTimeString()}</p>
+                  </div>
+                  <span className="text-xs px-2 py-1 bg-destructive/20 text-destructive rounded font-mono shrink-0">{alert.severity}</span>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }
