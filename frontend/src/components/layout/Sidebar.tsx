@@ -35,13 +35,13 @@ export default function Sidebar() {
             onClick={() => setOpen(false)}
             className={cn(
               "flex items-center gap-3 px-4 py-3 rounded-md transition-all duration-300",
-              pathname === route.href
+              pathname === route.href || (route.href === "/dashboard" && pathname === "/dashboard")
                 ? "bg-primary/20 text-primary border border-primary/50 shadow-[inset_0_0_10px_rgba(var(--primary),0.2)]"
                 : "text-muted-foreground hover:bg-white/5 hover:text-foreground"
             )}
           >
             <ClientOnly>
-              <route.icon className={cn("h-5 w-5", pathname === route.href ? "neon-text" : "")} />
+              <route.icon className={cn("h-5 w-5", pathname === route.href || (route.href === "/dashboard" && pathname === "/dashboard") ? "neon-text" : "")} />
             </ClientOnly>
             <span className="font-medium">{route.label}</span>
           </Link>
@@ -89,3 +89,4 @@ export default function Sidebar() {
     </>
   );
 }
+
