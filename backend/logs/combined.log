@@ -318,3 +318,5 @@
 {"level":"info","message":"Connected to Mock MQTT broker","timestamp":"2026-05-16T21:26:07.441Z"}
 {"level":"info","message":"Subscribed to factory/sensors/+","timestamp":"2026-05-16T21:26:07.442Z"}
 {"level":"info","message":"Rule triggered: gas > 800 -> Action: TURN_ON_FAN","timestamp":"2026-05-16T21:26:20.404Z"}
+{"level":"info","message":"Simulator connected to MQTT broker","timestamp":"2026-05-29T14:57:40.543Z"}
+{"level":"info","message":"Sensor simulators started","timestamp":"2026-05-29T14:57:40.546Z"}
