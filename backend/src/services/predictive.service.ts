@@ -21,19 +21,19 @@ export const runPredictiveAnalysis = async () => {
       }
 
       if (isIncreasing && Number(readings[0]?.value) > 30) {
-        // Check if an unresolved predictive alert already exists in last 10 minutes
-        const tenMinutesAgo = new Date(Date.now() - 10 * 60 * 1000);
+        // Allow new alert every 30 seconds only
+        const thirtySecondsAgo = new Date(Date.now() - 30 * 1000);
         const existing = await prisma.alert.findFirst({
           where: {
             sensor_id: 'TEMP_001',
             resolved: false,
             message: { contains: 'Predictive Alert' },
-            createdAt: { gte: tenMinutesAgo }
+            createdAt: { gte: thirtySecondsAgo }
           }
         });
 
         if (existing) {
-          logger.info('Predictive alert already exists, skipping duplicate.');
+          logger.info('Predictive alert cooldown active, skipping.');
           return;
         }
 
@@ -58,5 +58,5 @@ export const runPredictiveAnalysis = async () => {
   }
 };
 
-// Run every 30 seconds
-setInterval(runPredictiveAnalysis, 30000);
+// Run every 5 seconds for demo
+setInterval(runPredictiveAnalysis, 5000);
