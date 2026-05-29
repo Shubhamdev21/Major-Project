@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
@@ -43,21 +43,24 @@ export default function SettingsPage() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6 pb-24">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight neon-text mb-2">System Settings</h1>
-        <p className="text-muted-foreground">Configure your industrial monitoring preferences.</p>
+        <h1 className="text-2xl sm:text-3xl font-bold tracking-tight neon-text mb-1 sm:mb-2">System Settings</h1>
+        <p className="text-sm text-muted-foreground">Configure your industrial monitoring preferences.</p>
       </div>
-      <div className="grid gap-6 max-w-2xl">
+
+      <div className="grid gap-4 sm:gap-6 w-full max-w-2xl">
+
+        {/* Telegram Subscription */}
         <Card className="glass border border-primary/30">
-          <CardHeader>
-            <CardTitle>Subscribe to Telegram Alerts</CardTitle>
-            <CardDescription>Get real-time industrial alerts on your Telegram!</CardDescription>
+          <CardHeader className="p-4 sm:p-6">
+            <CardTitle className="text-base sm:text-lg">Subscribe to Telegram Alerts</CardTitle>
+            <CardDescription className="text-xs sm:text-sm">Get real-time industrial alerts on your Telegram!</CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="bg-primary/10 rounded-lg p-4 text-sm space-y-2">
-              <p className="font-semibold text-primary">How to get your Chat ID:</p>
-              <ol className="list-decimal list-inside space-y-1 text-muted-foreground">
+          <CardContent className="space-y-4 p-4 sm:p-6 pt-0">
+            <div className="bg-primary/10 rounded-lg p-3 sm:p-4 text-sm space-y-2">
+              <p className="font-semibold text-primary text-xs sm:text-sm">How to get your Chat ID:</p>
+              <ol className="list-decimal list-inside space-y-1 text-muted-foreground text-xs sm:text-sm">
                 <li>Open Telegram app</li>
                 <li>Search for @userinfobot</li>
                 <li>Send /start</li>
@@ -65,7 +68,7 @@ export default function SettingsPage() {
               </ol>
             </div>
             <div className="space-y-2">
-              <Label>Your Name (optional)</Label>
+              <Label className="text-xs sm:text-sm">Your Name (optional)</Label>
               <input
                 type="text"
                 placeholder="Enter your name"
@@ -75,7 +78,7 @@ export default function SettingsPage() {
               />
             </div>
             <div className="space-y-2">
-              <Label>Telegram Chat ID</Label>
+              <Label className="text-xs sm:text-sm">Telegram Chat ID</Label>
               <input
                 type="text"
                 placeholder="e.g. 123456789"
@@ -87,60 +90,64 @@ export default function SettingsPage() {
             <Button
               onClick={handleSubscribe}
               disabled={loading}
-              className="w-full neon-border bg-primary/20 hover:bg-primary/40 text-primary-foreground"
+              className="w-full neon-border bg-primary/20 hover:bg-primary/40 text-primary-foreground text-sm"
             >
               {loading ? "Subscribing..." : "Subscribe to Alerts"}
             </Button>
           </CardContent>
         </Card>
+
+        {/* Notifications */}
         <Card className="glass">
-          <CardHeader>
-            <CardTitle>Notifications</CardTitle>
-            <CardDescription>Manage how you receive alerts.</CardDescription>
+          <CardHeader className="p-4 sm:p-6">
+            <CardTitle className="text-base sm:text-lg">Notifications</CardTitle>
+            <CardDescription className="text-xs sm:text-sm">Manage how you receive alerts.</CardDescription>
           </CardHeader>
-          <CardContent className="space-y-6">
-            <div className="flex items-center justify-between">
-              <div className="space-y-0.5">
-                <Label>Push Notifications</Label>
+          <CardContent className="space-y-4 sm:space-y-6 p-4 sm:p-6 pt-0">
+            <div className="flex items-start justify-between gap-4">
+              <div className="space-y-0.5 flex-1 min-w-0">
+                <Label className="text-sm">Push Notifications</Label>
                 <p className="text-xs text-muted-foreground">Receive real-time alerts in the browser.</p>
               </div>
-              <Switch defaultChecked />
+              <Switch defaultChecked className="flex-shrink-0 mt-0.5" />
             </div>
-            <div className="flex items-center justify-between">
-              <div className="space-y-0.5">
-                <Label>Telegram Alerts</Label>
+            <div className="flex items-start justify-between gap-4">
+              <div className="space-y-0.5 flex-1 min-w-0">
+                <Label className="text-sm">Telegram Alerts</Label>
                 <p className="text-xs text-muted-foreground">Forward critical alerts to your Telegram bot.</p>
               </div>
-              <Switch defaultChecked />
+              <Switch defaultChecked className="flex-shrink-0 mt-0.5" />
             </div>
-            <div className="flex items-center justify-between">
-              <div className="space-y-0.5">
-                <Label>Email Digest</Label>
+            <div className="flex items-start justify-between gap-4">
+              <div className="space-y-0.5 flex-1 min-w-0">
+                <Label className="text-sm">Email Digest</Label>
                 <p className="text-xs text-muted-foreground">Receive daily summary reports via email.</p>
               </div>
-              <Switch />
+              <Switch className="flex-shrink-0 mt-0.5" />
             </div>
           </CardContent>
         </Card>
+
+        {/* System Preferences */}
         <Card className="glass">
-          <CardHeader>
-            <CardTitle>System Preferences</CardTitle>
-            <CardDescription>General monitoring behavior.</CardDescription>
+          <CardHeader className="p-4 sm:p-6">
+            <CardTitle className="text-base sm:text-lg">System Preferences</CardTitle>
+            <CardDescription className="text-xs sm:text-sm">General monitoring behavior.</CardDescription>
           </CardHeader>
-          <CardContent className="space-y-6">
-            <div className="flex items-center justify-between">
-              <div className="space-y-0.5">
-                <Label>Auto-Resolve Alerts</Label>
+          <CardContent className="space-y-4 sm:space-y-6 p-4 sm:p-6 pt-0">
+            <div className="flex items-start justify-between gap-4">
+              <div className="space-y-0.5 flex-1 min-w-0">
+                <Label className="text-sm">Auto-Resolve Alerts</Label>
                 <p className="text-xs text-muted-foreground">Mark alerts as resolved when sensors return to normal.</p>
               </div>
-              <Switch defaultChecked />
+              <Switch defaultChecked className="flex-shrink-0 mt-0.5" />
             </div>
-            <div className="flex items-center justify-between">
-              <div className="space-y-0.5">
-                <Label>Refresh Interval</Label>
+            <div className="flex items-start justify-between gap-4">
+              <div className="space-y-0.5 flex-1 min-w-0">
+                <Label className="text-sm">Refresh Interval</Label>
                 <p className="text-xs text-muted-foreground">Frequency of analytics data polling.</p>
               </div>
-              <select className="bg-background/50 border border-white/10 rounded px-2 py-1 text-sm focus:outline-none focus:border-primary">
+              <select className="flex-shrink-0 bg-background/50 border border-white/10 rounded px-2 py-1 text-xs sm:text-sm focus:outline-none focus:border-primary">
                 <option>5 Seconds</option>
                 <option>10 Seconds</option>
                 <option>30 Seconds</option>
@@ -148,13 +155,18 @@ export default function SettingsPage() {
             </div>
           </CardContent>
         </Card>
+
+        {/* Save button - always visible */}
         <div className="flex justify-end">
-          <Button onClick={handleSave} className="neon-border bg-primary/20 hover:bg-primary/40 text-primary-foreground">
+          <Button
+            onClick={handleSave}
+            className="w-full sm:w-auto neon-border bg-primary/20 hover:bg-primary/40 text-primary-foreground text-sm px-6"
+          >
             SAVE CONFIGURATION
           </Button>
         </div>
+
       </div>
     </div>
   );
 }
-
