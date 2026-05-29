@@ -46,13 +46,18 @@ export default function Topbar() {
     router.push('/login');
   };
 
+  const handleOpenAlert = () => {
+    router.push('/dashboard/alerts');
+    setShowNotifications(false);
+  };
+
   return (
-    <header className="h-16 glass border-b border-white/10 flex items-center justify-between px-3 sm:px-6 sticky top-0 z-50">
+    <header className="h-14 sm:h-16 glass border-b border-white/10 flex items-center justify-between px-3 sm:px-6 sticky top-0 z-50">
       <div className="flex items-center gap-2 flex-1 ml-10 lg:ml-0">
-        <div className="text-xs sm:text-sm font-mono text-muted-foreground hidden lg:block">
+        <div className="text-[10px] sm:text-sm font-mono text-muted-foreground hidden lg:block whitespace-nowrap">
           {mounted ? new Date().toISOString().replace('T', ' ').substring(0, 19) + ' UTC' : ''}
         </div>
-        <div className="relative max-w-md w-full ml-2 hidden md:block">
+        <div className="relative max-w-xs sm:max-w-md w-full ml-2 hidden md:block">
           <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
             <Search className="h-4 w-4 text-muted-foreground" />
           </div>
@@ -64,7 +69,7 @@ export default function Topbar() {
         </div>
       </div>
 
-      <div className="flex items-center gap-2 sm:gap-4">
+      <div className="flex items-center gap-1 sm:gap-4">
         {/* Notification Bell */}
         <div className="relative" ref={notifRef}>
           <button
@@ -79,9 +84,8 @@ export default function Topbar() {
             )}
           </button>
 
-          {/* Dropdown - mobile full width, desktop fixed width */}
           {showNotifications && (
-            <div className="fixed sm:absolute right-2 sm:right-0 top-16 sm:top-12 left-2 sm:left-auto sm:w-80 glass border border-white/10 rounded-xl shadow-2xl z-[100] overflow-hidden">
+            <div className="fixed sm:absolute left-2 right-2 sm:left-auto sm:right-0 top-14 sm:top-12 sm:w-80 glass border border-white/10 rounded-xl shadow-2xl z-[100] overflow-hidden mx-auto sm:mx-0">
               <div className="flex items-center justify-between px-4 py-3 border-b border-white/10">
                 <span className="font-semibold text-sm">Notifications</span>
                 <div className="flex items-center gap-2">
@@ -106,20 +110,28 @@ export default function Topbar() {
                       <AlertTriangle className={`h-4 w-4 mt-0.5 shrink-0 ${alert.severity === 'CRITICAL' ? 'text-red-500' : 'text-yellow-500'}`} />
                       <div className="flex-1 min-w-0">
                         <p className="text-xs text-foreground line-clamp-2">{alert.message}</p>
-                        <p className="text-[10px] text-muted-foreground mt-0.5">
+                        <p className="text-[10px] text-muted-foreground mt-0.5 font-mono">
                           {new Date(alert.createdAt).toLocaleString()}
                         </p>
                       </div>
-                      <span className={`text-[10px] font-bold shrink-0 ${alert.resolved ? 'text-green-500' : 'text-red-500'}`}>
-                        {alert.resolved ? 'OK' : 'OPEN'}
-                      </span>
+                      {!alert.resolved && (
+                        <button
+                          onClick={handleOpenAlert}
+                          className="text-[10px] font-bold text-red-500 hover:text-red-400 hover:underline shrink-0 cursor-pointer"
+                        >
+                          OPEN
+                        </button>
+                      )}
+                      {alert.resolved && (
+                        <span className="text-[10px] font-bold text-green-500 shrink-0">OK</span>
+                      )}
                     </div>
                   ))
                 )}
               </div>
               <div className="px-4 py-2 border-t border-white/10">
                 <button
-                  onClick={() => { router.push('/dashboard/alerts'); setShowNotifications(false); }}
+                  onClick={handleOpenAlert}
                   className="text-xs text-primary hover:underline w-full text-center py-1"
                 >
                   View all alerts →
