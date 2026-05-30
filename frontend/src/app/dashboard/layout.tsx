@@ -59,8 +59,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       socket.on('alert', (alert) => {
         addAlert(alert);
         toast.error(`🚨 ALERT: ${alert.message}`, {
-          duration: 6000,
-          className: 'bg-destructive text-destructive-foreground border-destructive-foreground',
+          duration: 5000,      // auto-close after 5 seconds
+          closeButton: true,   // show X button that works
         });
       });
     };
