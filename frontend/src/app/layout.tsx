@@ -16,7 +16,7 @@ export default function RootLayout({
     <html lang="en" className="dark" suppressHydrationWarning>
       <body className={`${inter.className} bg-background text-foreground antialiased selection:bg-primary selection:text-primary-foreground`} suppressHydrationWarning>
         {children}
-        <Toaster theme="dark" position="top-right" closeButton duration={5000} />
+        <Toaster theme="dark" position="top-right" duration={5000} />
       </body>
     </html>
   );
