@@ -1,22 +1,16 @@
 ﻿"use client";
-
-import { useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useEffect, useRef } from "react";
 import Sidebar from "@/components/layout/Sidebar";
 import Topbar from "@/components/layout/Topbar";
 import { useStore } from "@/store/useStore";
-import io from "socket.io-client";
+import io, { Socket } from "socket.io-client";
 import { toast } from "sonner";
 import api from "@/lib/api";
-import ClientOnly from "@/components/ClientOnly";
 import AuthGuard from "@/components/auth/AuthGuard";
 
-export default function DashboardLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const { updateSensor, addAlert, setSensors, setAlerts } = useStore();
+  const socketRef = useRef<Socket | null>(null);
 
   useEffect(() => {
     const fetchInitialData = async () => {
@@ -36,21 +30,46 @@ export default function DashboardLayout({
     fetchInitialData();
 
     const socketUrl = process.env.NEXT_PUBLIC_WS_URL || 'http://localhost:5000';
-    const socket = io(socketUrl);
 
-    socket.on('sensor_update', (data) => {
-      updateSensor(data);
-    });
+    const connectSocket = () => {
+      if (socketRef.current?.connected) return;
 
-    socket.on('alert', (alert) => {
-      addAlert(alert);
-      toast.error(`ALERT: ${alert.message}`, {
-        className: 'bg-destructive text-destructive-foreground border-destructive-foreground',
+      const socket = io(socketUrl, {
+        reconnection: true,
+        reconnectionAttempts: Infinity,
+        reconnectionDelay: 2000,
+        reconnectionDelayMax: 10000,
+        timeout: 20000,
       });
-    });
+
+      socketRef.current = socket;
+
+      socket.on('connect', () => {
+        console.log('Socket connected:', socket.id);
+      });
+
+      socket.on('disconnect', (reason) => {
+        console.log('Socket disconnected:', reason);
+      });
+
+      socket.on('sensor_update', (data) => {
+        updateSensor(data);
+      });
+
+      socket.on('alert', (alert) => {
+        addAlert(alert);
+        toast.error(`🚨 ALERT: ${alert.message}`, {
+          duration: 6000,
+          className: 'bg-destructive text-destructive-foreground border-destructive-foreground',
+        });
+      });
+    };
+
+    connectSocket();
 
     return () => {
-      socket.disconnect();
+      socketRef.current?.disconnect();
+      socketRef.current = null;
     };
   }, [updateSensor, addAlert, setSensors, setAlerts]);
 
