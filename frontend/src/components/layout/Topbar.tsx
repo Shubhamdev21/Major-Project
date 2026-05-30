@@ -52,8 +52,14 @@ export default function Topbar() {
     setShowNotifications(false);
   };
 
-  const handleClearAll = () => {
-    setAlerts([]);
+  const handleClearAll = async () => {
+    try {
+      await api.delete('/alerts/delete-all');
+      setAlerts([]);
+    } catch (err) {
+      // fallback: just clear from UI
+      setAlerts([]);
+    }
   };
 
   return (
@@ -75,7 +81,6 @@ export default function Topbar() {
       </div>
 
       <div className="flex items-center gap-1 sm:gap-4">
-        {/* Notification Bell */}
         <div className="relative" ref={notifRef}>
           <button
             onClick={() => setShowNotifications(!showNotifications)}
@@ -91,7 +96,6 @@ export default function Topbar() {
 
           {showNotifications && (
             <div className="fixed sm:absolute left-2 right-2 sm:left-auto sm:right-0 top-14 sm:top-12 sm:w-80 glass border border-white/10 rounded-xl shadow-2xl z-[100] overflow-hidden mx-auto sm:mx-0">
-              {/* Header */}
               <div className="flex items-center justify-between px-4 py-3 border-b border-white/10">
                 <div className="flex items-center gap-2">
                   <span className="font-semibold text-sm">Notifications</span>
@@ -116,7 +120,6 @@ export default function Topbar() {
                 </div>
               </div>
 
-              {/* List */}
               <div className="max-h-64 sm:max-h-72 overflow-y-auto">
                 {alerts.length === 0 ? (
                   <div className="flex flex-col items-center justify-center py-8 text-muted-foreground text-sm">
@@ -135,10 +138,7 @@ export default function Topbar() {
                         </p>
                       </div>
                       {!alert.resolved ? (
-                        <button
-                          onClick={handleOpenAlert}
-                          className="text-[10px] font-bold text-red-500 hover:text-red-400 hover:underline shrink-0 cursor-pointer"
-                        >
+                        <button onClick={handleOpenAlert} className="text-[10px] font-bold text-red-500 hover:text-red-400 hover:underline shrink-0 cursor-pointer">
                           OPEN
                         </button>
                       ) : (
@@ -149,12 +149,8 @@ export default function Topbar() {
                 )}
               </div>
 
-              {/* Footer */}
               <div className="px-4 py-2 border-t border-white/10 flex items-center justify-between">
-                <button
-                  onClick={handleOpenAlert}
-                  className="text-xs text-primary hover:underline py-1"
-                >
+                <button onClick={handleOpenAlert} className="text-xs text-primary hover:underline py-1">
                   View all alerts →
                 </button>
                 {alerts.length > 10 && (
