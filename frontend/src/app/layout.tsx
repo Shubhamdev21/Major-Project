@@ -4,7 +4,7 @@ import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
 const inter = Inter({ subsets: ["latin"] });
 export const metadata: Metadata = {
-  title: "MAJOR_IOT | Industrial IoT Monitoring",
+  title: "Industrial IoT Monitoring",
   description: "Advanced environment monitoring for major project evaluation",
 };
 export default function RootLayout({
