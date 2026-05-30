@@ -1,16 +1,18 @@
-import prisma from '../prisma';
+﻿import prisma from '../prisma';
 import mqttClient from '../mqtt';
 import logger from '../utils/logger';
 import { getIO } from '../websocket';
 import { sendTelegramAlert } from './telegram.service';
+
+// Cooldown map: ruleId -> last triggered timestamp
+const cooldowns = new Map<string, number>();
+const COOLDOWN_MS = 60 * 1000; // 1 minute cooldown per rule
 
 export const evaluateRules = async (reading: any) => {
   try {
     const rules = await prisma.automationRule.findMany({ where: { enabled: true } });
 
     for (const rule of rules) {
-      // rule.condition like "temperature > 40" or "gas > 800"
-      // Basic parser for "sensor_type operator value"
       const parts = rule.condition.split(' ');
       if (parts.length !== 3) continue;
 
@@ -24,38 +26,43 @@ export const evaluateRules = async (reading: any) => {
         if (operator === '==' && reading.value === threshold) triggered = true;
 
         if (triggered) {
+          // Check cooldown - skip if this rule fired within the last minute
+          const lastFired = cooldowns.get(rule.id) || 0;
+          const now = Date.now();
+          if (now - lastFired < COOLDOWN_MS) {
+            logger.info(`Rule ${rule.condition} skipped (cooldown active, ${Math.round((COOLDOWN_MS - (now - lastFired)) / 1000)}s remaining)`);
+            continue;
+          }
+
+          // Update cooldown
+          cooldowns.set(rule.id, now);
+
           logger.info(`Rule triggered: ${rule.condition} -> Action: ${rule.action}`);
 
-          // Example Action: "TURN_ON_FAN"
           if (rule.action.startsWith('TURN_ON_')) {
-            const actuator = String(rule.action.split('_')[2]).toLowerCase(); // e.g. 'fan'
+            const actuator = String(rule.action.split('_')[2]).toLowerCase();
             const command = 'ON';
             mqttClient.publish(`factory/actuators/${actuator}`, JSON.stringify({ command, trigger: rule.id }));
-            
             await prisma.actuatorLog.create({
-              data: {
-                actuator,
-                command,
-                status: 'TRIGGERED_BY_RULE'
-              }
+              data: { actuator, command, status: 'TRIGGERED_BY_RULE' }
             });
           }
 
-          // Generate an Alert
           const alert = await prisma.alert.create({
             data: {
               sensor_id: reading.sensor_id,
-              severity: 'CRITICAL',
-              message: `Rule triggered: ${rule.condition}. Value was ${reading.value}. Action: ${rule.action}`
+              severity: reading.value > threshold * 1.5 ? 'CRITICAL' : 'WARNING',
+              message: `Rule triggered: ${rule.condition}. Value was ${reading.value.toFixed(2)}. Action: ${rule.action}`
             }
           });
 
-          // Broadcast alert via WS
           const io = getIO();
           io.emit('alert', alert);
 
-          // Send Telegram Alert
-          await sendTelegramAlert(alert.message);
+          // Send Telegram alert (non-blocking)
+          sendTelegramAlert(alert.message).catch(err =>
+            logger.error(`Telegram send failed: ${err.message}`)
+          );
         }
       }
     }

@@ -1,7 +1,7 @@
 ﻿"use client";
 import { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { Bell, LogOut, Search, User, AlertTriangle, CheckCircle, X } from "lucide-react";
+import { Bell, LogOut, Search, User, AlertTriangle, CheckCircle, X, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useStore } from "@/store/useStore";
@@ -14,6 +14,7 @@ export default function Topbar() {
   const [showNotifications, setShowNotifications] = useState(false);
   const notifRef = useRef<HTMLDivElement>(null);
   const alerts = useStore((state) => state.alerts);
+  const setAlerts = useStore((state) => state.setAlerts);
   const unreadAlerts = alerts.filter(a => !a.resolved).length;
 
   useEffect(() => {
@@ -51,6 +52,10 @@ export default function Topbar() {
     setShowNotifications(false);
   };
 
+  const handleClearAll = () => {
+    setAlerts([]);
+  };
+
   return (
     <header className="h-14 sm:h-16 glass border-b border-white/10 flex items-center justify-between px-3 sm:px-6 sticky top-0 z-50">
       <div className="flex items-center gap-2 flex-1 ml-10 lg:ml-0">
@@ -86,17 +91,32 @@ export default function Topbar() {
 
           {showNotifications && (
             <div className="fixed sm:absolute left-2 right-2 sm:left-auto sm:right-0 top-14 sm:top-12 sm:w-80 glass border border-white/10 rounded-xl shadow-2xl z-[100] overflow-hidden mx-auto sm:mx-0">
+              {/* Header */}
               <div className="flex items-center justify-between px-4 py-3 border-b border-white/10">
-                <span className="font-semibold text-sm">Notifications</span>
                 <div className="flex items-center gap-2">
+                  <span className="font-semibold text-sm">Notifications</span>
                   {unreadAlerts > 0 && (
                     <Badge variant="destructive" className="text-[10px]">{unreadAlerts} unread</Badge>
+                  )}
+                </div>
+                <div className="flex items-center gap-2">
+                  {alerts.length > 0 && (
+                    <button
+                      onClick={handleClearAll}
+                      className="flex items-center gap-1 text-[10px] text-muted-foreground hover:text-red-400 transition-colors px-1.5 py-0.5 rounded hover:bg-red-500/10"
+                      title="Clear all notifications"
+                    >
+                      <Trash2 className="h-3 w-3" />
+                      <span>Clear all</span>
+                    </button>
                   )}
                   <button onClick={() => setShowNotifications(false)}>
                     <X className="h-4 w-4 text-muted-foreground hover:text-foreground" />
                   </button>
                 </div>
               </div>
+
+              {/* List */}
               <div className="max-h-64 sm:max-h-72 overflow-y-auto">
                 {alerts.length === 0 ? (
                   <div className="flex flex-col items-center justify-center py-8 text-muted-foreground text-sm">
@@ -114,28 +134,32 @@ export default function Topbar() {
                           {new Date(alert.createdAt).toLocaleString()}
                         </p>
                       </div>
-                      {!alert.resolved && (
+                      {!alert.resolved ? (
                         <button
                           onClick={handleOpenAlert}
                           className="text-[10px] font-bold text-red-500 hover:text-red-400 hover:underline shrink-0 cursor-pointer"
                         >
                           OPEN
                         </button>
-                      )}
-                      {alert.resolved && (
+                      ) : (
                         <span className="text-[10px] font-bold text-green-500 shrink-0">OK</span>
                       )}
                     </div>
                   ))
                 )}
               </div>
-              <div className="px-4 py-2 border-t border-white/10">
+
+              {/* Footer */}
+              <div className="px-4 py-2 border-t border-white/10 flex items-center justify-between">
                 <button
                   onClick={handleOpenAlert}
-                  className="text-xs text-primary hover:underline w-full text-center py-1"
+                  className="text-xs text-primary hover:underline py-1"
                 >
                   View all alerts →
                 </button>
+                {alerts.length > 10 && (
+                  <span className="text-[10px] text-muted-foreground">{alerts.length - 10} more</span>
+                )}
               </div>
             </div>
           )}
