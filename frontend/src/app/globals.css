@@ -1,4 +1,4 @@
-@import "tailwindcss";
+﻿@import "tailwindcss";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 
@@ -142,3 +142,8 @@
     box-shadow: 0 0 10px var(--primary), inset 0 0 10px var(--primary);
   }
 }
+/* Hide sonner close button */
+[data-sonner-toast] [data-close-button] {
+  display: none !important;
+}
+
